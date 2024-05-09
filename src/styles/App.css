@@ -1,0 +1,43 @@
+
+:root {
+  --purple-accent: #646cff;
+  --blue-accent: #61dafb;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+
+  min-height: calc(100vh - 8rem);
+  background: linear-gradient(135deg, #646CFF 0%, #61DAFB 100%);
+  padding: 4rem 8rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header h1 {
+  color: white;
+  font-size: 2rem;
+}
+
+.header h1 span {
+  color: red;
+}
+
+.header .scoreboard {
+  display: flex;
+  gap: 1rem;
+}
+
+.card-collection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
