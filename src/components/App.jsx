@@ -20,12 +20,44 @@ const cards = []
 for(let i = 0; i < NUM_CARDS; i+=1) {
   cards.push(
     <Card 
+      key={i}
       name={examplePokemonData.name}
       imgSrc={examplePokemonData.imgSrc}
       onClick={onCardClick}
     />
   )
 }
+
+async function getPokemonInfo(id) {
+  try {
+    // grab the data for the given pokemon
+    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+    const pokeData = await response.json()
+    return pokeData
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function getDiagnosticInfo(keyword) {
+  try {
+    // grab the resource/API info for the pokemon data 
+    const response = await fetch(`https://pokeapi.co/api/v2/${keyword}/`)
+    const diagnosticData = await response.json()
+    return diagnosticData
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+getDiagnosticInfo('pokemon').then((response) => {
+  console.log(response)
+})
+
+const randomId = 1//Math.random();
+getPokemonInfo(randomId).then((response) => {
+  console.log(response)
+})
 
 function App() {
   const [score, setScore] = useState(0);
