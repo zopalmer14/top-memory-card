@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Card from './Card.jsx'
 import pokeImage from '../assets/eevee.jpg'
 import '../styles/App.css'
@@ -14,31 +14,7 @@ const onCardClick = function onCardClick(event) {
   return event.target;
 }
 
-// create Card collection
-const NUM_CARDS = 8
-const cards = []
-for(let i = 0; i < NUM_CARDS; i+=1) {
-  cards.push(
-    <Card 
-      key={i}
-      name={examplePokemonData.name}
-      imgSrc={examplePokemonData.imgSrc}
-      onClick={onCardClick}
-    />
-  )
-}
-
-async function getPokemonInfo(id) {
-  try {
-    // grab the data for the given pokemon
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
-    const pokeData = await response.json()
-    return pokeData
-  } catch (error) {
-    console.log(error)
-  }
-}
-
+// pokemon count / diagnostic data retrieval
 async function getDiagnosticInfo(keyword) {
   try {
     // grab the resource/API info for the pokemon data 
@@ -50,18 +26,57 @@ async function getDiagnosticInfo(keyword) {
   }
 }
 
-getDiagnosticInfo('pokemon').then((response) => {
-  console.log(response)
-})
+// grab the number of available pokemon from the API
+/* POKE_COUNT = await getDiagnosticInfo('pokemon').then((response) => {
+  return response.count
+}) */
 
-const randomId = 1//Math.random();
-getPokemonInfo(randomId).then((response) => {
-  console.log(response)
-})
+// individual pokemon data retrieval
+async function getPokemonInfo(id) {
+  try {
+    // grab the data for the given pokemon
+    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+    const pokemonInfo = await response.json()
+    return pokemonInfo
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// CONSTANTS
+const POKE_COUNT = 1025
+const NUM_CARDS = 8
+
+// gather the pokemon data for each card 
+async function gatherPokeData() {
+  const pokeData = []
+  for(let i = 0; i < NUM_CARDS; i+=1) {
+    const randomId = Math.floor(Math.random() * POKE_COUNT);
+
+    const apiData = await getPokemonInfo(randomId).then((response) => {
+      return {
+        id: randomId,
+        name: response.name,
+        imgSrc: response.sprites.front_default
+      }
+    })
+
+    pokeData.push(apiData)
+  }
+  return pokeData
+}
 
 function App() {
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
+  const [pokeData, setPokeData] = useState([])
+
+  // side effect that grabs the PokeAPI data 
+  useEffect(() => {
+    gatherPokeData().then((response) => {
+      setPokeData(response)
+    })
+  }, [])
 
   return (
     <>
@@ -73,7 +88,16 @@ function App() {
         </div>
       </div>
       <div className='card-collection'>
-        {cards}
+        {pokeData && pokeData.map((data) => {
+          return (
+            <Card 
+              key={data.id}
+              name={data.name}
+              imgSrc={data.imgSrc}
+              onClick={onCardClick}
+            />
+          )
+        })}
       </div>
     </>
   )
